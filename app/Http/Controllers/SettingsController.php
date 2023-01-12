@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Checkout;
+use App\Nota;
 use Illuminate\Http\Request;
 use App\Settings;
 use Illuminate\Support\Facades\Auth;
@@ -64,7 +64,7 @@ class SettingsController extends Controller
 
     public function upload(Request $request, $trx)
     {
-        $checkout = Checkout::where('trx_no', $trx)->firstOrFail();
+        $checkout = Nota::where('trx_no', $trx)->firstOrFail();
 
         $data = [
             'checkout' => $checkout

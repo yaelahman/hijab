@@ -25,6 +25,8 @@ Route::get('/cara-order', 'LandingController@caraOrder')->name('landing.caraorde
 Route::get('/fetch/products', 'LandingController@allProducts')->name('fetch.products');
 Route::get('/detail/{id}', 'LandingController@detail');
 Route::post('/add-cart', 'LandingController@addCart')->name('add.cart');
+Route::post('/checkout/store', 'LandingController@checkout')->name('checkout.store');
+Route::get('/add-information', 'LandingController@userInformationCheckout')->name('fill.user');
 
 Route::get('/upload/{trx}', 'LandingController@upload');
 Route::post('/checkout/upload', 'CheckoutController@upload')->name('checkout.upload');

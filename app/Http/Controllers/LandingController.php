@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Testimoni;
 use App\Category;
-use App\Checkout;
-use App\FAQ;
+use App\Nota;
+use App\NotaDetail;
 use App\Product;
 use App\Settings;
 use Illuminate\Http\Request;
@@ -20,6 +20,7 @@ class LandingController extends Controller
         if (isset($request->category)) {
             $products->where('id_category', $request->category);
         }
+        // dd($products->get());
 
         $settings = [];
         foreach (Settings::all() as $set) {
@@ -42,6 +43,7 @@ class LandingController extends Controller
     {
         $products = Product::with(['Image', 'Category'])
             ->orderBy('id', 'desc')
+            ->where('stock', '>', 0)
             ->limit(10);
         if (isset($request->category)) {
             $products->where('id_category', $request->category);
@@ -61,17 +63,15 @@ class LandingController extends Controller
         ]);
     }
 
-    public function checkout($request)
+    public function checkout(Request $request)
     {
         $judul = Settings::where('name', 'judul')->first();
         $wa = Settings::where('name', 'whatsapp')->first();
         $pesan = "Halo Admin $judul->text, saya ingin memesan | ";
         $total = 0;
 
-        $checkout = new Checkout();
+        $checkout = new Nota();
         $checkout->trx_no = "TRX" . rand(1000000000, 99999999999);
-        $checkout->data = json_encode($request->session()->get('cart'));
-
 
         foreach ($request->session()->get('cart') as $item) {
             $total += $item['harga'] * $item['jumlah'];
@@ -79,16 +79,48 @@ class LandingController extends Controller
         }
         $pesan .= " Total yang harus dibayar Rp . " . number_format($total, 0);
 
-        $checkout->total = $total;
+        $checkout->name = $request->name;
+        $checkout->phone = $request->phone;
+        $checkout->address = $request->address;
         $checkout->save();
 
+        foreach ($request->session()->get('cart') as $row) {
+            $detail = new NotaDetail();
+            $detail->id_product = $row['id'];
+            $detail->id_nota = $checkout->id;
+            $detail->qty = $row['jumlah'];
+            $detail->total = $row['jumlah'] * $row['harga'];
+            $detail->save();
+        }
 
         $pesan .= " Jika sudah melakukan pembayaran, mohon upload bukti transaksi pada link " . url('upload/' . $checkout->trx_no) . " . ";
         $pesan .= " Terimakasih.";
 
-
-
+        $request->session()->forget('cart');
         return redirect()->to('https://api.whatsapp.com/send?phone=62' . $wa->text . '&text=' . $pesan);
+    }
+
+    public function userInformationCheckout(Request $request)
+    {
+
+        $category = Category::all();
+
+        $settings = [];
+        foreach (Settings::all() as $set) {
+            $settings[$set->name] = $set->text;
+        }
+        // $request->session()->forget('cart');
+        // dd($request->session()->get('cart'));
+
+        $data = [
+            'products' => $request->session()->get('cart'),
+            'category' => $category,
+            'settings' => $settings,
+            'testimoni' => Testimoni::orderBy('order', 'asc')->get(),
+            'detail' => false
+        ];
+        // dd($data);
+        return view('user_information', $data);
     }
 
     public function addCart(Request $request)
@@ -100,7 +132,10 @@ class LandingController extends Controller
             $request->session()->flash('message', 'Berhasil mengosongkan keranjang');
             return redirect()->back();
         } else if ($request->has('checkout')) {
-            return $this->checkout($request);
+
+            $request->session()->flash('alert', 'warning');
+            $request->session()->flash('message', 'Harap inputkan informasi terlebih dahulu');
+            return redirect()->to(route('fill.user'));
         }
         $product = Product::with(['Image', 'Category'])->find($request->id_product);
         $data = $request->session()->has('cart') ? $request->session()->get('cart') : [];
@@ -175,7 +210,7 @@ class LandingController extends Controller
         // dd($products->first());
 
         $data = [
-            'checkout' => Checkout::where('trx_no', $trx)->firstOrFail(),
+            'checkout' => Nota::where('trx_no', $trx)->firstOrFail(),
             'settings' => $settings,
             'category' => Category::all(),
             'detail' => true

@@ -19,8 +19,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $product = Product::where('id_users', Auth::user()->id)
-            ->orderBy('id', 'desc')
+        $product = Product::orderBy('id', 'desc')
             ->get();
 
         $data = [
@@ -58,13 +57,12 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             $product = new Product();
-            $product->id_users = Auth::user()->id;
             $product->id_category = $request->id_category;
             $product->name = $request->name;
             $product->description = $request->description;
             $product->harga = $request->harga;
             $product->status = 1;
-            $product->on_click = 0;
+            $product->stock = $request->stock;
 
             if ($product->save()) {
                 if ($request->image != null) {
@@ -149,6 +147,7 @@ class ProductController extends Controller
             $product->name = $request->name;
             $product->description = $request->description;
             $product->harga = $request->harga;
+            $product->stock = $request->stock;
 
             if ($product->save()) {
                 ImageProduct::where('id_product', $id)

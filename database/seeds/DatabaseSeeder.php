@@ -20,6 +20,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'role' => 1
         ]);
+        DB::table('category')->insert([
+            'name' => 'Category 1',
+        ]);
+        DB::table('category')->insert([
+            'name' => 'Category 2',
+        ]);
 
         // DB::table('settings')->insert([
         //     'name' => 'background',

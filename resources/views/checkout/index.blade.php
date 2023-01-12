@@ -36,15 +36,37 @@
                             <tr>
                                 <th class="border-top-0">No.</th>
                                 <th class="border-top-0">No Order</th>
+                                <th class="border-top-0">Nama</th>
+                                <th class="border-top-0">No Telepon</th>
+                                <th class="border-top-0">Alamat</th>
+                                <th class="border-top-0">Pesanan</th>
+                                <th class="border-top-0">Jumlah</th>
                                 <th class="border-top-0">Bukti</th>
                                 <th class="border-top-0">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($checkout as $index => $row)
+                                @php
+                                    $total = 0;
+                                @endphp
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $row->trx_no }}</td>
+                                    <td>{{ $row->name }}</td>
+                                    <td>{{ $row->phone }}</td>
+                                    <td>{{ $row->address }}</td>
+                                    <td>
+                                        <ul>
+                                            @foreach ($row->Detail as $item)
+                                                @php
+                                                    $total = $total + $item->total;
+                                                @endphp
+                                                <li>{{ $item->Product->stock }} {{ $item->Product->name }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                    <td>{{ number_format($total, 0) }}</td>
                                     <td>
                                         @if (!$row->image)
                                             BELUM MELAKUKAN PEMBAYARAN

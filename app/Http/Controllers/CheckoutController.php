@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Checkout;
+use App\Nota as Checkout;
+use App\NotaDetail;
+use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -11,7 +13,11 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        $checkout = Checkout::orderBy('id', 'desc')->get();
+        $checkout = Checkout::with([
+            'Detail' => function ($query) {
+                $query->with('Product');
+            }
+        ])->orderBy('id', 'desc')->get();
 
         $data = [
             'checkout' => $checkout
@@ -30,6 +36,21 @@ class CheckoutController extends Controller
             $newName = $name . $format;
             $request->file('image')->move(public_path() . '/bukti', $newName);
             $checkout->image = $newName;
+
+            $detail = NotaDetail::where('id_nota', $checkout->id)->get();
+            foreach ($detail as $row) {
+                $product = Product::find($row->id_product);
+                $product->stock = $product->stock - $row->qty;
+                if ($product->stock < 0) {
+
+                    $request->session()->flash('alert', 'danger');
+                    $request->session()->flash('message', 'Checkout updated failed, Stock empty');
+
+                    DB::rollBack();
+                    return redirect()->to(url(''));
+                }
+                $product->save();
+            }
 
             if ($checkout->save()) {
                 $request->session()->flash('alert', 'success');

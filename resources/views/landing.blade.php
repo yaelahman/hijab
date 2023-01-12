@@ -239,6 +239,13 @@
 @endsection
 @section('script')
     <script type="text/javascript">
+        var input_category = null;
+        $(document).on('click', '.navbar-vert', function(){
+            $('#btn-parent').trigger('click')
+            $('.kategori-text').html($(this).attr('data-name'))
+            input_category = $(this).attr('data-id')
+            fetchProducts({})
+        })
         const fetchProducts = async ({
             search = null,
             page = 1
@@ -260,7 +267,8 @@
                 type: "GET",
                 data: {
                     search: search,
-                    page: page
+                    page: page,
+                    category: input_category
                 }
             }).then((resp) => {
                 let data = resp.data.data

@@ -67,6 +67,13 @@
                                 class="form-control ps-0 form-control-line">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-12 mb-0">Stok Barang</label>
+                        <div class="col-md-12">
+                            <input type="number" id="stock" name="stock" required placeholder="0"
+                                class="form-control ps-0 form-control-line">
+                        </div>
+                    </div>
 
                     <button type="button" class="btn btn-primary addImageButton"><i class="fas fa-plus"></i>&nbsp;Tambah
                         Gambar

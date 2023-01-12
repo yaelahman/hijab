@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCheckoutTable extends Migration
+class CreateNotaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateCheckoutTable extends Migration
      */
     public function up()
     {
-        Schema::create('checkout', function (Blueprint $table) {
+        Schema::create('nota', function (Blueprint $table) {
             $table->id();
             $table->string('trx_no')->nullable();
             $table->string('image')->nullable();
-            $table->integer('total')->nullable();
-            $table->text('data')->nullable();
+            $table->string('name')->nullable();
+            $table->bigInteger('phone')->nullable();
+            $table->text('address')->nullable();
             $table->timestamps();
         });
     }

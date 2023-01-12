@@ -15,18 +15,16 @@ class CreateProductTable extends Migration
     {
         Schema::create('product', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_users');
-            $table->integer('id_category');
-            $table->string('name');
-            $table->text('description');
-            $table->bigInteger('whatsapp');
-            $table->integer('harga');
-            $table->integer('status');
-            $table->integer('on_click');
+            $table->unsignedBigInteger('id_category')->nullable();
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
+            $table->bigInteger('whatsapp')->nullable();
+            $table->integer('harga')->nullable();
+            $table->integer('status')->nullable();
+            $table->integer('stock')->nullable();
             $table->timestamps();
 
-            // $table->foreign('id_users')->references('id')->on('users')->onDelete('cascade');
-            // $table->foreign('id_category')->references('id')->on('category')->onDelete('cascade');
+            $table->foreign('id_category')->references('id')->on('category')->onDelete('cascade');
         });
     }
 
